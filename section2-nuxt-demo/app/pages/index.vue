@@ -69,6 +69,12 @@ onMounted(() => {
             </tbody>
         </table>
 
+        <div class="grid grid-cols-1 md:hidden gap-4">
+            <EmployeeCard v-for="employee in store.sortedEmployees" :key="employee.id" :employee="employee">
+                <p class="text-sm text-gray-400">Status: Active</p>
+            </EmployeeCard>
+        </div>
+
         <div class="mt-4 flex gap-2">
             <button @click="prevPage" :disabled="store.page === 1">Previous</button>
             <span>Page {{ store.page }}</span>
