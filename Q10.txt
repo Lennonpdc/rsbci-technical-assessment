@@ -1,0 +1,39 @@
+Q10. Debugging Scenario (10 pts)
+
+Your frontend is making a request to /api/employees, but it keeps returning CORS errors.
+• List 3 possible causes in a Laravel + Nuxt Docker setup.
+• Show how you would fix each.
+
+
+
+1. Wrong URL or port used
+- Nuxt is calling `/api/employees` (relative path), which resolves to Nuxt host (localhost:3000), not the Laravel backend localhost which is `127.0.0.1:8000`.
+- Results in a cross-origin request blocked by the browser
+
+How to fix:
+-Define it in your .env `API_BASE_URL=http://127.0.0.1:8000`
+
+const apiBase = import.meta.env.API_BASE_URL || 'http://127.0.0.1:8000'; // initialize it in store
+axios.get(`${apiBase}/api/employees`); // How to use
+
+
+2. Laravel not allowing the request from Nuxt using http://localhost:3000
+
+How to fix:
+-Create a config file or update the `config/cors.php`
+
+return [
+    'paths' => ['api/*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'], //allow the request here
+    'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'max_age' => 0,
+    'supports_credentials' => true,
+];
+
+-Clear cache, config, and optimize the BE
+    php artisan config:clear
+    php artisan route:clear
+    php artisan cache:clear
+    php artisan optimize:clear

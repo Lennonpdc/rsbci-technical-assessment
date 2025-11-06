@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  # Laravel / PHP
+  app:
+    image: php:8.2-fpm
+    container_name: laravel-app
+    working_dir: /var/www/html
+    volumes:
+      - ./Section1-laravel-demo:/var/www
+      - ./Section1-laravel-demo/vendor:/var/www/html/vendor
+    depends_on:
+      - db
+    networks:
+      - app-network
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+      DB_DATABASE: laravel_db
+      DB_USERNAME: postgres_user
+      DB_PASSWORD: postgres_password
+    command: >
+      sh -c "composer install &&
+             php artisan migrate --force &&
+             php artisan db:seed --force &&
+             php-fpm"
+
+  # PostgreSQL
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: laravel_db
+      POSTGRES_USER: laravel_user
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Node / Nuxt
+  nuxt:
+    image: node:20
+    container_name: nuxt-app
+    working_dir: /var/www/nuxt
+    volumes:
+      - ./Section2-nuxt-demo:/var/www/nuxt
+    depends_on:
+      - app
+    networks:
+      - app-network
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
