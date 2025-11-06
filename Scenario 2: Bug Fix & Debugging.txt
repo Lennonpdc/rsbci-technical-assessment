@@ -1,0 +1,32 @@
+Scenario 2: Bug Fix & Debugging
+
+
+public function index(Request $request)
+{
+    return Employee::with('department')
+        ->where('is_active', true)
+        ->paginate(20)
+        ->get();
+}
+
+1. Identify the bug(s).
+Answer: 
+    * Chaining `get()` after `paginate()` is not valid.
+    * `paginate()` already executes the query and returns a paginator, so `get()` will cause a runtime error.
+
+
+2. Fix the code.
+public function index(Request $request)
+{
+    $employees = Employee::with('department')
+        ->where('is_active', true)
+        ->paginate(20);
+
+    return response()->json($employees);
+}
+
+
+3. Explain what was wrong and why it would fail in production
+-`paginate()` returns a LengthAwarePaginator; calling `get()` afterward is undefined.
+-Without fixing, the API endpoint would return a 500 error in production.
+-Returning as JSON ensures the frontend receives the data correctly.

@@ -1,0 +1,21 @@
+Scenario 3: Optimization & Querying
+
+Your project assignments table has millions of rows. The query:
+`ProjectAssignment::where('employee_id', $employeeId)-
+>get();` is slow.
+
+1. Suggest two database optimizations.
+`CREATE INDEX idx_employee_id ON project_assignments(employee_id);`
+    -Add index on employee_id for a faster filtering
+
+
+2. Rewrite the query in Eloquent with proper eager loading of the related project.
+`$assignments = ProjectAssignment::with('project')
+    ->where('employee_id', $employeeId)
+    ->get();`
+
+
+
+3. Explain how you would confirm the optimization worked (tools or queries to check).
+
+
